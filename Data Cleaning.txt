@@ -1,0 +1,32 @@
+The SQL script provided outlines several steps for cleaning and preparing data within a database, specifically focusing on a table related to layoffs. Here's a detailed explanation of each step taken in the script:
+
+ Step 1: Remove Duplicates
+1. Creation of a Staging Table: The script starts by creating a staging table, `layoffs_staging`, which is an exact copy of the original `layoffs` table. This allows for modifications without altering the original data.
+   
+2. Identifying Duplicates: A Common Table Expression (CTE) named `duplicate_cte` is used to assign a row number to each row within the partition defined by multiple columns like company, location, industry, etc. The `ROW_NUMBER()` function helps in identifying duplicates based on these columns.
+
+3. Deletion of Duplicates: After identifying duplicates (rows with a `row_num` greater than 1), these rows are deleted from the staging table. This ensures each record is unique based on the defined criteria.
+
+ Step 2: Standardize Data
+1. Trimming Spaces: Spaces are trimmed from the `company` column to standardize the company names.
+
+2. Standardizing Industry Names: Industry names, particularly for industries like 'Crypto', are standardized to a single format (e.g., converting all variations of 'Crypto' to a single 'Crypto').
+
+3. Correcting Country Names: Trailing characters in the `country` column are removed (e.g., removing periods from 'United States.').
+
+4. Date Format Standardization: Dates are standardized to a consistent format and the `date` column's data type is changed to DATE instead of TEXT, ensuring date fields are handled correctly in queries.
+
+ Step 3: Null and Blank Values
+1. Identifying and Filling Null Values: Rows with null or blank values in critical fields like `industry` are identified. The script includes logic to fill these null values with the correct information if known (e.g., setting industry to 'Travel' for Airbnb).
+
+2. Deleting Rows with Insufficient Data: Rows that lack essential data (both `total_laid_off` and `percentage_laid_off` are null) are deemed uninformative and deleted.
+
+3. Setting Blanks to Null: For consistency in data handling and analysis, all blank values in the `industry` column are converted to NULL.
+
+ Step 4: Remove Unnecessary Columns or Rows
+1. Deleting Ineffective Rows: Additional rows that do not contribute to insights, such as those missing both laid-off counts and percentages, are removed.
+
+2. Dropping Redundant Columns: Once duplicates are managed and data is cleaned, the `row_num` column, initially used for identifying duplicates, is removed from the table.
+
+ Final Considerations
+The script implements a systematic approach to cleaning by addressing duplicates, inconsistencies in formatting and entries, and incomplete data. Each step improves the dataset's quality and usability for subsequent analysis or reporting, ensuring the data is reliable and standardized. This approach is crucial in data-driven environments where decision-making depends heavily on data accuracy and integrity.
